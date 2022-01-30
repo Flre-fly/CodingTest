@@ -1,0 +1,83 @@
+import java.awt.*;
+import java.util.Scanner;
+
+public class Main {
+    static int [][]arr;
+    static int white = 0;
+    static int blue = 0;
+    public static void divibePaper(int [][]arr, int n){
+        boolean flag = false;
+        int a = arr[0][0];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(arr[i][j] != a) {
+                    flag = true;
+                    break;
+                }
+            }
+        }
+        if(flag){
+            //네개로 나눠서 넣어줘야돼
+            int [][]arr1 = new int[n/2][n/2];
+            int [][]arr2 = new int[n/2][n/2];
+            int [][]arr3 = new int[n/2][n/2];
+            int [][]arr4 = new int[n/2][n/2];
+
+            for(int i=0;i<n/2;i++){
+                for(int j=0;j<n/2;j++){
+                    arr1[i][j] = arr[i][j];
+                }
+            }
+            int k = 0,m=0;
+            for(int i=n/2;i<n;i++,k++){
+                for(int j=n/2;j<n;j++,m++){
+                    arr4[k][m] = arr[i][j];
+                }
+                m=0;
+            }
+            k = 0;
+            m=0;
+            for(int i=n/2;i<n;i++,k++){
+                for(int j=0;j<n/2;j++,m++){
+                    arr2[k][m] = arr[i][j];
+                }
+                m=0;
+            }
+
+            k = 0;
+            m=0;
+            for(int i=0;i<n/2;i++,k++){
+                for(int j=n/2;j<n;j++,m++){
+                    arr3[k][m] = arr[i][j];
+                }
+                m=0;
+            }
+
+
+            divibePaper(arr1, n/2);
+            divibePaper(arr2, n/2);
+            divibePaper(arr3, n/2);
+            divibePaper(arr4, n/2);
+        }
+        else{
+            //그러면 배열에 저장한다.
+            if(arr[0][0] == 1) blue++;
+            else white++;
+        }
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        arr = new int[n][n];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                arr[i][j] = sc.nextInt();
+            }
+        }
+        divibePaper(arr, n);
+        System.out.println(white);
+        System.out.println(blue);
+
+
+    }
+}
