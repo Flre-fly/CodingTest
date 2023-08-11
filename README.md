@@ -12,7 +12,8 @@
   - 15665(n과 m 11)
   - 15666(N과 M (12))
 - 투포인터
-  - 2003(수들의 합2)
+  - 2003(수들의 합2) ✅
+  - 20922(겹치는 건 싫어)
  
 ### HashSet과 LinkedHashSet의 차이
 - HashSet: 원소의 순서를 보장하지 않습니다. 즉, 원소들이 임의의 순서로 저장됩니다.
@@ -25,16 +26,16 @@
 
 ### 투포인터 알고리즘
 ```java
-        int result = 0;
-        int r = 0;
-        int l = 0;
-        int sum = 0;
-        while(l<=r){
-            if(sum >= m) sum -= arr[l++];
-            else if(r==n) break;//sum이 m보다 작고 r이 n과 같으면 뭔짓을 해도 안 커지니 끝내버린다
-            else sum += arr[r++];
-
-            if(sum==m) result++;
+	while(l < n) { // r이 아니라 l인 이유는 r이 끝까지 도달해도 l이 범위를 축소하면서 정답이 나올 수 있기 때문입니다
+            if(result < sum && r < n) { // 하지만 while문을 저렇게 설정하면 r이 범위밖으로 나가서 outofindex가 나올 수도있으니 이 조건을 추가해 줍니다
+                result += arr[r];
+                r++;
+            } else {
+                result -= arr[l];
+                l++;
+            }
+            //합계는 더한 후에 계산합니다 그래야 마지막 순번까지 계산이 됩니다
+            if(sum == result) count++;
         }
 ```
 ### 9095의 문제가 순열/조합이 아닌 이유
