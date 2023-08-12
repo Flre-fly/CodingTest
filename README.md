@@ -1,5 +1,4 @@
 # [JAVA] 코딩 테스트 대비 알고리즘 문제 풀이
-
 ### 복습할 문제
 - 🔄: 1개당 복습1번 완료(다시 풀어야하는 문제)
 - ✅: 안봐도 되는 문제
@@ -14,8 +13,10 @@
   - 15665(n과 m 11)
   - 15666(N과 M (12))
 - 투포인터
+  - 1806(부분합) 🔄
   - 2003(수들의 합2) 🔄
-  - 20922(겹치는 건 싫어)
+  - 20922(겹치는 건 싫어) 🔄
+  - 1644(소수의 연속합)
  
 ### HashSet과 LinkedHashSet의 차이
 - HashSet: 원소의 순서를 보장하지 않습니다. 즉, 원소들이 임의의 순서로 저장됩니다.
@@ -28,16 +29,30 @@
 
 ### 투포인터 알고리즘
 ```java
-	while(l < n) { // r이 아니라 l인 이유는 r이 끝까지 도달해도 l이 범위를 축소하면서 정답이 나올 수 있기 때문입니다
-            if(result < sum && r < n) { // 하지만 while문을 저렇게 설정하면 r이 범위밖으로 나가서 outofindex가 나올 수도있으니 이 조건을 추가해 줍니다
-                result += arr[r];
-                r++;
-            } else {
-                result -= arr[l];
+        int l =0;
+        int r=0;
+        int sum = 0;
+        int min = Integer.MAX_VALUE;
+        while(r<n){//r을 기준으로 삼는다 l은 내부 while문에서 사용된다
+            sum += arr[r];
+            r++;
+            while(sum >= s){
+                //sum에서 배열값을 모두 빼버리게 되는 경우 이 while문에서 빠져나올수있음
+                min = Math.min(min, r-l);
+                sum -= arr[l];
+                l++;//l이 아무리 커진다고 해도 r보다 커질순없음. 왜냐면 그 순간엔 sum 이 0이 될테니깐
+            }
+        }
+
+	//1644코드 일부
+        while(r < primeList.size() && primeList.get(r) <= n) {//r을 기준으로 삼는다 l은 내부 while문에서 사용한다
+            sum += primeList.get(r);
+            r++;
+            while(sum > n && l < r) {
+                sum -= primeList.get(l);
                 l++;
             }
-            //합계는 더한 후에 계산합니다 그래야 마지막 순번까지 계산이 됩니다
-            if(sum == result) count++;
+            if(sum == n) result++;//동일 조건문을 가장 아래에 배치하여 r과 l의탐색이 끝난후 처리하도록 한다
         }
 ```
 ### 9095의 문제가 순열/조합이 아닌 이유
