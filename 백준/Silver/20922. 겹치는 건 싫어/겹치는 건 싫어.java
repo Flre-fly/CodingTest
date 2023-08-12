@@ -1,39 +1,36 @@
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
     public static void main(String args[]) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String input[] = br.readLine().split(" ");
         int n = Integer.parseInt(input[0]);
-        int limit = Integer.parseInt(input[1]);
+        int s = Integer.parseInt(input[1]);//같은게 s이하로 있어야함
         int arr[] = new int[n];
         String input2[] = br.readLine().split(" ");
-        int max = 0;
+        int m = 0;
         for(int i=0;i<n;i++){
             arr[i] = Integer.parseInt(input2[i]);
-            max = Math.max(max, arr[i]);
+            m = Math.max(m, arr[i]);
         }
-        int count[] = new int[max+1];
-        int l = 0;
-        int r = 0;
-        int result = 0;
-        //<while문의 기준이 r이되는 이유>
-        //오른쪽 포인터는 처음부터 끝까지 전체 시퀀스를 통해 이동합니다. 모든 번호를 하나씩 확인합니다.
-        //왼쪽 포인터는 현재 창에서 숫자가 K번 이상 나타날 때만 움직입니다. 이 경우 왼쪽은 오른쪽으로 이동하여 반복되는 숫자를 제외합니다.
-        //시퀀스의 모든 숫자를 확인하려고 하므로 오른쪽이 시퀀스(N)의 끝에 도달하지 않는 한 루프는 계속됩니다.
+        int count[] = new int[m+1];
+        int l=0;
+        int r=0;
+        int max = Integer.MIN_VALUE;//수열의 최장 길이
         while(r<n){
-            if(count[arr[r]]+1 <= limit){
-                count[arr[r]]++;
-                r++;
-            }else{
-                count[arr[l]]--;
-                l++;
+            count[arr[r]]++;
+            while(count[arr[r]] > s){
+                //s개를 초과하면 s개를 안초과할때까지 수열길이를 줄여준다
+                //s는 1보다 크고 배열에 존재하는 값은 1개이상 존재할것이니 범위초과발생안함
+                count[arr[l++]]--;
             }
-            result = Math.max(result, r-l);
-        }
-        System.out.print(result);
+            max = Math.max(max, r-l+1);
+            r++;
 
+        }
+
+
+        System.out.print(max);
     }
 }
