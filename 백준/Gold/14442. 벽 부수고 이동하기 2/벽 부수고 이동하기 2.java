@@ -1,97 +1,72 @@
 import java.io.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
 
-	static int N, M, K;
-	static int[][] board;
-	static boolean[][][] visited;
+    static int miro[][];
+    static boolean visited[][][];
+    static int dx[] = {0,0,1,-1};
+    static int dy[] = {1,-1,0,0};
+    static class Point{
+        int r;
+        int c;
+        int k;
+        int t;
+        Point(int r, int c, int k, int t){
+            this.r=r;
+            this.c=c;
+            this.k=k;
+            this.t=t;
+        }
+    }
+    static int bfs(){
+        Queue<Point> q = new LinkedList<>();
+        q.add(new Point(0,0,0,1));
+        int min = Integer.MAX_VALUE;
+        while(!q.isEmpty()){
+            Point cur = q.poll();
+            visited[cur.r][cur.c][cur.k] = true;
+            if(cur.r==r-1 && cur.c==c-1) return cur.t;
+            for(int i=0;i<4;i++){
+                int rr = cur.r+dx[i];
+                int cc = cur.c+dy[i];
+                if(rr>=r|| cc>=c|| rr<0|| cc<0) continue;
+                if(rr==r-1 && cc==c-1) return cur.t+1;
+                if(miro[rr][cc]==0){
+                    if(!visited[rr][cc][cur.k]){
+                        visited[rr][cc][cur.k] = true;
+                        q.add(new Point(rr,cc,cur.k, cur.t+1));
+                    }
 
-	public static void main(String[] args) throws Exception {
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
-		String[] input = br.readLine().split(" ");
-		N = Integer.parseInt(input[0]);
-		M = Integer.parseInt(input[1]);
-		K = Integer.parseInt(input[2]);
-
-		board = new int[N + 1][M + 1];
-		visited = new boolean[N + 1][M + 1][K + 1];
-
-		for (int i = 1; i <= N; i++) {
-			String str = br.readLine();
-			for (int j = 1; j <= M; j++) {
-				board[i][j] = str.charAt(j - 1) - '0';
-			}
-		}
-
-		bw.write(bfs() + "\n");
-		bw.flush();
-
-	}
-
-	public static int bfs() {
-
-		int[] r = { 0, 1, 0, -1 };
-		int[] c = { 1, 0, -1, 0 };
-
-		Queue<Pair> q = new LinkedList<>();
-		q.offer(new Pair(new Pos(1, 1), 0, 1));
-		visited[1][1][0] = true;
-
-		while (!q.isEmpty()) {
-
-			Pair pair = q.poll();
-			Pos pos = pair.pos;
-
-			if (pos.r == N && pos.c == M) {
-				return pair.cnt;
-			}
-
-			for (int i = 0; i < 4; i++) {
-				int nr = pos.r + r[i];
-				int nc = pos.c + c[i];
-
-				if ((1 <= nr && nr <= N) && (1 <= nc && nc <= M)) {
-					if (board[nr][nc] == 0 && !visited[nr][nc][pair.wall]) {
-						q.offer(new Pair(new Pos(nr, nc), pair.wall, pair.cnt + 1));
-						visited[nr][nc][pair.wall] = true;
-					}
-
-					else if (board[nr][nc] == 1 && pair.wall < K && !visited[nr][nc][pair.wall + 1]) {
-						q.offer(new Pair(new Pos(nr, nc), pair.wall + 1, pair.cnt + 1));
-						visited[nr][nc][pair.wall + 1] = true;
-					}
-				}
-			}
-		}
-
-		return -1;
-	}
-
-	static class Pair {
-
-		int cnt;
-		Pos pos;
-		int wall;
-
-		Pair(Pos pos, int wall, int cnt) {
-			this.pos = pos;
-			this.wall = wall;
-			this.cnt = cnt;
-		}
-	}
-
-	static class Pos {
-
-		int r, c;
-
-		Pos(int r, int c) {
-			this.r = r;
-			this.c = c;
-		}
-	}
+                }else{
+                    if(cur.k<k &&!visited[rr][cc][cur.k+1]){//이 경우에만 최소 한번만 갈수있음
+                        visited[rr][cc][cur.k+1] = true;
+                        q.add(new Point(rr,cc,cur.k+1, cur.t+1));
+                    }
+                }
+            }
+        }
+        return min==Integer.MAX_VALUE?-1:min;
+    }
+    static int r;
+    static int c;
+    static int k;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String input[] = br.readLine().split(" ");
+        r = Integer.parseInt(input[0]);
+        c = Integer.parseInt(input[1]);
+        k = Integer.parseInt(input[2]);
+        visited = new boolean[r][c][k+1];
+        miro = new int[r][c];
+        for(int i=0;i<r;i++){
+            char arr[] = br.readLine().toCharArray();
+            for(int j=0;j<c;j++){
+                miro[i][j] = arr[j]-'0';
+            }
+        }
+        System.out.print(bfs());
+    }
 
 }
