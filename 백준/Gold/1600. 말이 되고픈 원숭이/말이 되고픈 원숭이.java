@@ -1,79 +1,82 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-    static class Point{
-        int r;
-        int c;
-        int t;
-        int count;
-        Point(int r, int c, int t, int count){
-            this.r=r;
-            this.c=c;
-            this.t=t;
-            this.count = count;
-        }
-    }
-    static int dx[] = {0,0,1,-1};
-    static int dy[] = {1,-1,0,0};
-    static int dx2[] = {2, 1, -2, -1, 2, 1, -2, -1};
-    static int dy2[] = { 1, 2, 1, 2, -1, -2, -1, -2};
-    static boolean visited[][][];
-    static int bfs(){
-        Queue<Point> q = new LinkedList<>();
-        q.add(new Point(0,0,1, k));
-        int min = Integer.MAX_VALUE;
-        while(!q.isEmpty()){
-            Point cur = q.poll();
-            for(int i=0;i<dx.length;i++){
-                int rr = cur.r+dx[i];
-                int cc = cur.c+dy[i];
-                if(rr>=r || cc>=c || rr<0 || cc<0 || map[rr][cc]==1) continue;
-                if(rr==r-1 && cc==c-1) min = Math.min(min, cur.t);
-                if(!visited[rr][cc][cur.count]){
-                    visited[rr][cc][cur.count] = true;
-                    q.add(new Point(rr,cc, cur.t+1, cur.count));
-                }
-            }
-            if(cur.count>0){
-                for(int i=0;i<dx2.length;i++){
-                    int rr = cur.r+dx2[i];
-                    int cc = cur.c+dy2[i];
-                    if(rr>=r || cc>=c || rr<0 || cc<0 || map[rr][cc]==1) continue;
-                    if(rr==r-1 && cc==c-1) min = Math.min(min, cur.t);
-                    if(!visited[rr][cc][cur.count-1]){
-                        visited[rr][cc][cur.count-1] = true;
-                        q.add(new Point(rr,cc, cur.t+1, cur.count-1));
-                    }
-                }
-            }
 
-        }
-        return min;
-    }
-    static int map[][];
-    static int k;
-    static int r;
-    static int c;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        k =Integer.parseInt(br.readLine());
-        String input[] = br.readLine().split(" ");
-        c = Integer.parseInt(input[0]);
-        r = Integer.parseInt(input[1]);
-        map = new int[r][c];
-        visited =new boolean[r][c][k+1];
-        for(int i=0;i<r;i++){
-            String input2[] = br.readLine().split(" ");
-            for(int j=0;j<c;j++){
-                map[i][j] = Integer.parseInt(input2[j]);
-            }
-        }
-        if(c==r && r==1) System.out.print("0");
-        else{
-            int time = bfs();
-            System.out.print(time==Integer.MAX_VALUE?"-1":time);
-        }
-    }
+	static int K, W, H;
+	static int[][] map;
+	static boolean[][][] visited;
+	static int cnt;
+	
+	static int[] dr = {-1, 0, 1, 0, -2, -1, 1, 2, 2, 1, -1, -2};
+	static int[] dc = {0, 1, 0, -1, 1, 2, 2, 1, -1, -2, -2, -1};
+
+
+	public static void main(String[] args) throws Exception {
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
+
+		K = Integer.parseInt(br.readLine());
+		st = new StringTokenizer(br.readLine());
+		W = Integer.parseInt(st.nextToken());
+		H = Integer.parseInt(st.nextToken());
+
+		map = new int[H][W];
+
+		for (int i = 0; i < H; i++) {
+			st = new StringTokenizer(br.readLine());
+			for (int j = 0; j < W; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+
+		visited = new boolean[H][W][K+1];
+		
+		bfs();
+
+	}
+	
+	static void bfs() {
+
+		LinkedList<int[]> queue = new LinkedList<int[]>();
+		queue.add(new int[] { 0, 0, 0 });
+		visited[0][0][0]=true;
+		
+		int move=0;
+		while (!queue.isEmpty()) {
+			int size = queue.size();
+			while (size--> 0) {
+				
+				int[] val = queue.poll();
+				int r = val[0];
+				int c = val[1];
+				int horsecnt = val[2];
+
+				if(r==H-1 && c==W-1) {
+					System.out.println(move);
+					System.exit(0);
+				}
+				
+				int length = (horsecnt==K?4:12);
+
+				for (int d = 0; d < length; d++) {
+					int nextr = r + dr[d];
+					int nextc = c + dc[d];
+
+					if(d==4) ++horsecnt;
+					
+					if (nextr < 0 || nextc < 0 || nextr >= H || nextc >= W || map[nextr][nextc] == 1 || visited[nextr][nextc][horsecnt]) continue;
+					
+					queue.add(new int[] { nextr, nextc, horsecnt });
+					visited[nextr][nextc][horsecnt]=true;
+				}
+			}
+			++move;
+		}
+		
+		System.out.println(-1);
+
+	}
 
 }
