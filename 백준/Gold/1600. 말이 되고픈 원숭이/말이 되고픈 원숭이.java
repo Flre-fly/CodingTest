@@ -1,82 +1,84 @@
-import java.util.*;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
 
-	static int K, W, H;
-	static int[][] map;
-	static boolean[][][] visited;
-	static int cnt;
-	
-	static int[] dr = {-1, 0, 1, 0, -2, -1, 1, 2, 2, 1, -1, -2};
-	static int[] dc = {0, 1, 0, -1, 1, 2, 2, 1, -1, -2, -2, -1};
+    static int r;
+    static int c;
+    static int k;
+    static int dx[] = {0,0,1,-1};
+    static int dy[] = {1,-1,0,0};
+    static int hx[] = {-2, -1, 1, 2, 2, 1, -1, -2};
+    static int hy[] = {1, 2, 2, 1, -1, -2, -2, -1};
+    static int map[][];
+    static boolean visited[][][];
+    static int bfs(){
+        Queue<Point> q = new LinkedList<>();
+        q.add(new Point(0,0, k));
+        int time=0;
+        while(!q.isEmpty()){
+            int size = q.size();
+            while(size>0){
+                Point cur = q.poll();
+                visited[cur.r][cur.c][cur.k] = true;
+                if(cur.r==r-1 && cur.c==c-1) return time;
+                //상하좌우
+                for(int i=0;i<dx.length;i++){
+                    int rr = cur.r + dx[i];
+                    int cc = cur.c + dy[i];
+                    if(rr>=r||cc>=c||rr<0||cc<0) continue;
+                    if(!visited[rr][cc][cur.k] && map[rr][cc]==0){
+                        q.add(new Point(rr,cc, cur.k));
+                        visited[rr][cc][cur.k] = true;
+                    }
+                }
+                if(cur.k>0){
+                    for(int i=0;i<hx.length;i++){
+                        int rr = cur.r + hx[i];
+                        int cc = cur.c + hy[i];
+                        if(rr>=r||cc>=c||rr<0||cc<0) continue;
+                        if(!visited[rr][cc][cur.k-1] && map[rr][cc]==0){
+                            q.add(new Point(rr,cc, cur.k-1));
+                            visited[rr][cc][cur.k-1] = true;
+                        }
+                    }
+                }
+                size--;
+            }
+            time++;
+
+        }
+
+        return -1;
+    }
+    static class Point{
+        int r;
+        int c;
+        int k;//내가 사용할 수있는 말의 움직임횟수
+        Point(int r, int c, int k){
+            this.r=r;
+            this.c=c;
+            this.k=k;
+        }
+    }
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        k = Integer.parseInt(br.readLine());
+        String input[] = br.readLine().split(" ");
+        c = Integer.parseInt(input[0]);
+        r = Integer.parseInt(input[1]);
+        map = new int[r][c];
+        visited = new boolean[r][c][k+1];
+        for(int i=0;i<r;i++) {
+            String input2[]= br.readLine().split(" ");
+            for(int j=0;j<c;j++) {
+                map[i][j] = Integer.parseInt(input2[j]);
+            }
+        }
+        System.out.println(bfs());
 
 
-	public static void main(String[] args) throws Exception {
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = null;
-
-		K = Integer.parseInt(br.readLine());
-		st = new StringTokenizer(br.readLine());
-		W = Integer.parseInt(st.nextToken());
-		H = Integer.parseInt(st.nextToken());
-
-		map = new int[H][W];
-
-		for (int i = 0; i < H; i++) {
-			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < W; j++) {
-				map[i][j] = Integer.parseInt(st.nextToken());
-			}
-		}
-
-		visited = new boolean[H][W][K+1];
-		
-		bfs();
-
-	}
-	
-	static void bfs() {
-
-		LinkedList<int[]> queue = new LinkedList<int[]>();
-		queue.add(new int[] { 0, 0, 0 });
-		visited[0][0][0]=true;
-		
-		int move=0;
-		while (!queue.isEmpty()) {
-			int size = queue.size();
-			while (size--> 0) {
-				
-				int[] val = queue.poll();
-				int r = val[0];
-				int c = val[1];
-				int horsecnt = val[2];
-
-				if(r==H-1 && c==W-1) {
-					System.out.println(move);
-					System.exit(0);
-				}
-				
-				int length = (horsecnt==K?4:12);
-
-				for (int d = 0; d < length; d++) {
-					int nextr = r + dr[d];
-					int nextc = c + dc[d];
-
-					if(d==4) ++horsecnt;
-					
-					if (nextr < 0 || nextc < 0 || nextr >= H || nextc >= W || map[nextr][nextc] == 1 || visited[nextr][nextc][horsecnt]) continue;
-					
-					queue.add(new int[] { nextr, nextc, horsecnt });
-					visited[nextr][nextc][horsecnt]=true;
-				}
-			}
-			++move;
-		}
-		
-		System.out.println(-1);
-
-	}
+    }
 
 }
