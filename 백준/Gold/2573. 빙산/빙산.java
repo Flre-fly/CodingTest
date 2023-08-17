@@ -1,143 +1,79 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.StringTokenizer;
- 
-class IceBerg {
-    int x;
-    int y;
- 
-    IceBerg(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
- 
+
 public class Main {
-    static int[] rangeX = { -1, 0, 1, 0 };
-    static int[] rangeY = { 0, 1, 0, -1 };
- 
-    static int N, M;
-    static int[][] map;
- 
-    public static void main(String[] args) throws Exception {
+
+    static class Point{
+        int r;
+        int c;
+        Point(int r, int c){
+            this.r=r;
+            this.c=c;
+        }
+    }
+    static void dfs(int i, int j){
+        visited[i][j] = true;
+
+        for(int k=0;k<4;k++){
+            int rr = i+ dx[k];
+            int cc = j+ dy[k];
+            if(rr>=r||cc>=c||rr<0||cc<0|| visited[rr][cc]) continue;
+            //주변에 0 이있으면 map을 감소시킨다
+            if(snow[rr][cc]==0){
+                if(snow[i][j]>0) snow[i][j]--;
+            }
+            else{
+                visited[rr][cc] = true;
+                dfs(rr,cc);
+            }
+            //주변에 1이상이 있으면 dfs 에 넣는다
+        }
+    }
+    static int r;
+    static int c;
+    static int dx[] = {0,0,1,-1};
+    static int dy[] = {1,-1,0,0};
+    static int snow[][];
+    static boolean visited[][];
+    static Queue<Point> q = new LinkedList<>();
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
- 
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
- 
-        map = new int[N][M];
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < M; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
- 
-        int ans = 0;
-        int cnt = 0;
- 
-        // 빙하가 2개 이상 분리될 경우 반복문을 종료.
-        // 빙하가 다 녹아버렸을 경우, 0을 출력.
-        while ((cnt = SeparateNum()) < 2) {
-            if (cnt == 0) {
-                ans = 0;
-                break;
-            }
- 
-            Melt();
-            ans++;
-        }
- 
-        bw.write(ans + "\n");
-        bw.flush();
-        bw.close();
-        br.close();
-    }
- 
-    // 빙하가 분리된 개수를 구하는 함수.
-    public static int SeparateNum() {
-        boolean[][] visited = new boolean[N][M];
- 
-        int cnt = 0;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] != 0 && !visited[i][j]) {
-                    DFS(i, j, visited); // DFS 방식을 통해 총 몇개의 빙하로 나누어졌는지 구할 수 있음.
-                    cnt++;
+            String input[] = br.readLine().split(" ");
+            r = Integer.parseInt(input[0]);
+            c = Integer.parseInt(input[1]);
+            snow = new int[r][c];
+            for(int i=0;i<r;i++) {
+                String input2[]= br.readLine().split(" ");
+                for(int j=0;j<c;j++) {
+                    snow[i][j] = Integer.parseInt(input2[j]);
                 }
             }
-        }
-        return cnt;
-    }
- 
-    public static void DFS(int x, int y, boolean[][] visited) {
-        visited[x][y] = true;
- 
-        int dx, dy;
-        for (int i = 0; i < 4; i++) {
-            dx = x + rangeX[i];
-            dy = y + rangeY[i];
- 
-            if (dx < 0 || dy < 0 || dx >= N || dy >= M) {
-                continue;
-            }
- 
-            if (map[dx][dy] != 0 && !visited[dx][dy]) {
-                DFS(dx, dy, visited);
-            }
-        }
-    }
- 
-    // 빙하를 녹이는 함수.
-    public static void Melt() {
-        Queue<IceBerg> q = new LinkedList<>();
- 
-        // visited 배열을 만드는 이유
- 
-        // visited 배열이 없다면,
-        // 만약 1 2 가 있는 상태에서 1이 먼저 녹아서 0이 될 경우
-        // 2는 녹아서 없어진 1 자리도 0이라고 판단하여
-        // 필요 이상으로 더 많은 값을 녹이게 되어 버림.
-        boolean[][] visited = new boolean[N][M];
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] != 0) {
-                    q.offer(new IceBerg(i, j));
-                    visited[i][j] = true;
+
+            int result = 0;
+            int time=0;
+            while(true){
+                int count =0;
+                visited = new boolean[r][c];
+                for(int i=0;i<r;i++) {
+                    for(int j=0;j<c;j++) {
+                        if(!visited[i][j] && snow[i][j]>=1){
+                            dfs(i,j);
+                            count++;
+                        }
+                    }
                 }
-            }
-        }
- 
-        int dx, dy;
-        while (!q.isEmpty()) {
-            IceBerg ice = q.poll();
- 
-            int seaNum = 0; // 빙하 상하좌우에 존재하는 바다 영역의 수.
- 
-            for (int i = 0; i < 4; i++) {
-                dx = ice.x + rangeX[i];
-                dy = ice.y + rangeY[i];
- 
-                if (dx < 0 || dy < 0 || dx >= N || dy >= M) {
-                    continue;
+                if(count==0){
+                    break;
                 }
- 
-                if (!visited[dx][dy] && map[dx][dy] == 0) {
-                    seaNum++;
+                if(count > 1){
+                    result = time;
+                    break;
                 }
+                time++;
             }
- 
-            if (map[ice.x][ice.y] - seaNum < 0) {
-                map[ice.x][ice.y] = 0;
-            } else {
-                map[ice.x][ice.y] -= seaNum;
-            }
-        }
+            System.out.print(result);
+
     }
+
 }
