@@ -4,14 +4,6 @@ import java.util.Queue;
 
 public class Main {
 
-    static class Point{
-        int r;
-        int c;
-        Point(int r, int c){
-            this.r=r;
-            this.c=c;
-        }
-    }
     static void dfs(int i, int j){
         visited[i][j] = true;
 
@@ -36,7 +28,6 @@ public class Main {
     static int dy[] = {1,-1,0,0};
     static int snow[][];
     static boolean visited[][];
-    static Queue<Point> q = new LinkedList<>();
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             String input[] = br.readLine().split(" ");
