@@ -1,131 +1,124 @@
 import java.io.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int N, min = Integer.MAX_VALUE;
-    static int[][] map;
-    static boolean[][] visited;
-    static int[] dR = {1, -1, 0, 0};
-    static int[] dC = {0, 0, 1, -1};
 
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int n;
+    static int dx[] = {0,0,1,-1};
+    static int dy[] = {1,-1,0,0};
+    static int map[][];
+    static boolean visited[][];
+    static int bfs(int r, int c,int cnt){
+        //한점에서만 bfs를 진행할거기때문에 visited배열을 매번 초기화 해주어야한다
+        temp[r][c] = true;
+        visited = new boolean[n][n];
+        Queue<Point> q = new LinkedList<>();
+        q.add(new Point(r,c,0));
+        while(!q.isEmpty()){
+            //size 만큼 반복해주는 행위 = class에 len이라는 필드추가하는것과 같음
+            Point cur = q.poll();
+            //1x1의 예외상황을 처리하기 위함
+            visited[cur.r][cur.c] = true;
 
-        N = Integer.parseInt(br.readLine());
-        map = new int[N][N];
+            for(int i=0;i<4;i++){
+                int rr = cur.r + dx[i];
+                int cc = cur.c + dy[i];
+                if(rr>=n||cc>=n||rr<0||cc<0||visited[rr][cc]) continue;
+                //방문안한 점인데 0이면 그쪽으로 탐색을 진행한다. 그러다가 다른 지역을 만나면 result(time) 을 반환한다
+                if(map[rr][cc]==0){
+                    visited[rr][cc] = true;
+                    q.add(new Point(rr,cc,cur.t+1));
+                    //map[rr][cc]가 0 도 아니고 cnt도 아니라면 다른 대륙이다
+                    //time의 최소시간을 return해주자
+                }else if(map[rr][cc] != cnt){
+                    return cur.t;
+                }else{
+                   //추가
+                   temp[rr][cc] = true;
+                }
 
-        for(int i = 0; i<N; i++){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-
-            for(int j = 0; j<N; j++)
-                map[i][j] = Integer.parseInt(st.nextToken());
-        }
-
-        int type = 1;
-        visited = new boolean[N][N];
-        //섬 별로 나누기
-        for(int i =0; i<N; i++){
-            for(int j = 0; j<N; j++){
-                if(map[i][j] == 0)
-                    continue;
-                if(visited[i][j])
-                    continue;
-
-                typeCheck(i, j, type);
-                type++;
             }
         }
+        return Integer.MAX_VALUE;
 
-        //가장 가까운 거리의 섬 탐색
-        visited = new boolean[N][N];
-        for(int i =0; i<N; i++){
-            for(int j = 0; j<N; j++){
-                if(map[i][j] == 0)
-                    continue;
-                if(visited[i][j])
-                    continue;
-
-                bfs(i, j, map[i][j]);
-            }
-        }
-
-        System.out.println(min);
     }
-
+    //map에 있는 대륙의 개수를 count한다
     static void typeCheck(int row, int col, int type){
-        Queue<Node> q = new LinkedList<>();
-        q.offer(new Node(row, col));
-        visited[row][col] = true;
+        Queue<Point> q = new LinkedList<>();
+        q.offer(new Point(row, col,0));
+        temp[row][col] = true;
         map[row][col] = type;
 
         while(!q.isEmpty()){
-            Node vertex = q.poll();
+            Point vertex = q.poll();
 
             for(int i = 0; i<4; i++){
-                int dr = vertex.row + dR[i];
-                int dc = vertex.col + dC[i];
+                int dr = vertex.r + dx[i];
+                int dc = vertex.c + dy[i];
 
-                if(dr<0||dc<0||dr>=N||dc>=N)
+                if(dr<0||dc<0||dr>=n||dc>=n)
                     continue;
                 if(map[dr][dc] == 0)
                     continue;
-                if(visited[dr][dc])
+                if(temp[dr][dc])
                     continue;
 
-                visited[dr][dc] = true;
+                temp[dr][dc] = true;
                 map[dr][dc] = type;
-                q.offer(new Node(dr, dc));
+                q.offer(new Point(dr, dc,0));
             }
         }
     }
-
-    static void bfs(int row, int col, int type){
-        visited[row][col] = true;
-
-        Queue<Node> q = new LinkedList<>();
-        q.offer(new Node(row, col, 0));
-
-        boolean[][] isVisited = new boolean[N][N];
-        isVisited[row][col] = true;
-
-        while(!q.isEmpty()){
-            Node vertex = q.poll();
-
-            for(int i = 0; i<4; i++){
-                int dr = vertex.row + dR[i];
-                int dc = vertex.col + dC[i];
-
-                if(dr<0||dc<0||dr>=N||dc>=N)
-                    continue;
-                if(map[dr][dc] == type) {
-                    visited[dr][dc] = true;
-                    continue;
-                }
-                if(isVisited[dr][dc])
-                    continue;
-
-                if(map[dr][dc] == 0) {
-                    q.offer(new Node(dr, dc, vertex.len+1));
-                    isVisited[dr][dc] = true;
-                }
-                else if(map[dr][dc] != type){
-                    min = Math.min(min, vertex.len);
-                    return;
-                }
-            }
+    static class Point{
+        int r;
+        int c;
+        int t;
+        Point(int r, int c, int t){
+            this.r=r;
+            this.c=c;
+            this.t=t;
         }
     }
-}
-class Node{
-    int row, col, len;
+    static boolean temp[][];
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-    Node(int row, int col){
-        this.row = row;
-        this.col = col;
+        n = Integer.parseInt(br.readLine());
+        map = new int[n][n];
+
+        for(int i = 0; i<n; i++){
+            StringTokenizer st = new StringTokenizer(br.readLine());
+
+            for(int j = 0; j<n; j++)
+                map[i][j] = Integer.parseInt(st.nextToken());
+        }
+        //각섬을 섬1, 섬2, 섬3으로 구분한다
+        int type =1;
+        temp = new boolean[n][n];
+        for(int i =0; i<n; i++){
+            for(int j = 0; j<n; j++){
+                if(map[i][j] == 0||temp[i][j]) continue;
+
+                typeCheck(i, j, type++);
+            }
+        }
+        int min = Integer.MAX_VALUE;
+        temp = new boolean[n][n];
+        for(int i =0; i<n; i++){
+            for(int j = 0; j<n; j++){
+                if(map[i][j] == 0||temp[i][j]) continue;
+                //한점에 대해서 bfs 탐색을한다
+                //한점에 대해서만 탐색하니 여러 점에 의한 탐색 충돌이 안발생한다
+                temp[i][j] = true;
+                min = Math.min(min,bfs(i,j,map[i][j]));
+            }
+        }
+        //가장 짧은 다리 출력
+        System.out.println(min);
+
+
     }
-    Node(int row, int col, int len){
-        this.row = row;
-        this.col = col;
-        this.len = len;
-    }
+
 }
