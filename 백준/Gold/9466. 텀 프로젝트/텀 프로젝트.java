@@ -3,19 +3,16 @@ import java.io.*;
 public class Main {
     static void dfs(int start){
         if(visited[start]){
-            finished[start] = true;
-            count++;
+           finished[start] = true;
+           count++;
         }else visited[start] = true;
 
         int next = arr[start];
-        if(!finished[next]) dfs(next);
+        if(!finished[next]) dfs(next);//순환이 있는지 조사해본다
+        //dfs가 끝나고 나서
+        visited[start] = false;//매번 dfs마다 visited는 새로워야함
+        finished[start] = true;//한번의 dfs마다 start에 대한 조사는 완료됨
 
-        visited[start] = false;
-        // DFS 재귀 호출이 끝나면 visited 상태를 되돌려야 다음 경로에서 해당 노드가 다시 첫 방문으로 간주될 수 있습니다.
-        finished[start] = true;
-        //finished 배열은 노드가 완전히 처리되었는지 여부를 추적합니다.
-        // 노드가 완전히 처리되었다는 것은 그 노드를 시작으로 하는 모든 경로가 이미 탐색되었다는 의미입니다.
-        // 순환 구조가 발견되지 않은 경우에도, 해당 노드와 관련된 모든 탐색이 완료된 상태이므로 finished를 true로 설정합니다.
     }
     static int arr[];
     static int n;
